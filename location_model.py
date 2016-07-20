@@ -7,6 +7,7 @@ import urllib2
 from collections import OrderedDict
 import os
 
+sorry = "There is nothing nearby of interest. Seriously. We checked."
 
 class GetWikiData:
     def __init__(self, lat, lng):
@@ -27,9 +28,9 @@ class GetWikiData:
                 #    sections.append(cat)
                 self.json_response = json.dumps(text_dict)
             else:
-                self.json_response = json.dumps("""No record for your location. Try again on down the road.""")
+                self.json_response = json.dumps(sorry)
         else:
-            self.json_response = json.dumps("""No record for your location. Try again on down the road.""")
+            self.json_response = json.dumps(sorry)
 
     def clean_sorted(self, tups):
         l = []
@@ -39,19 +40,28 @@ class GetWikiData:
         print l
         return l
 
+    def clean(self, text):
+        return text.replace('_', ' ').replace('(', '').replace(')', '')
+
     def wiki_geosearch(self):
         """Utilizes wikipedia's geosearch functionality and page views API to return most relevant local info."""
-        closeby = wikipedia.geosearch(self.lat, self.lon, radius=1000)
-        important = wpv.WikiViews(closeby).sorted
-        clean_important = self.clean_sorted(important)
-        for imp in clean_important:
-            os.system("say " + imp)
-        most_important = important[0][0]
+        closeby = []
+        radius = 500
+        while len(closeby) < 1 and radius <= 10000:
+            print radius
+            closeby = wikipedia.geosearch(self.lat, self.lon, radius=radius)
+            radius += 500
         try:
-            closer = wikipedia.page(most_important).content.encode('utf-8')
+            important = wpv.WikiViews(closeby).sorted
+            clean_important = self.clean_sorted(important)
+            for imp in clean_important:
+                os.system("say " + imp)
+            most_important = important[0][0]  # This won't be needed once you let users select. Could be default.
+            closer = self.clean(wikipedia.page(most_important).content.encode('utf-8'))
             os.system("say " + str(closer))
         except IndexError:
-            print("There's nothing nearby of interest. Seriously. We checked.")
+            print(sorry)
+            os.system("say " + sorry)
 
     def wiki_work(self, namespace):
         """Get Wiki article associated with Town,_State naming convention. Return dict with sections and text."""
