@@ -1,7 +1,7 @@
 from mwviews.api import PageviewsClient
 from datetime import datetime as dt
 import datetime
-import operator
+
 
 class WikiViews:
     def __init__(self, pages):

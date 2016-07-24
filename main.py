@@ -1,27 +1,45 @@
-import location_model as lm
+import wikiwork as lm
 import sys
-import json
+import text as txt
 import os
 
+
+# def structure_data(self):
+#     if self.namespace:
+#         raw_wiki = self.wiki_work(self.namespace)
+#         if raw_wiki:
+#             text_dict = self.text_cleaning(raw_wiki)
+#             # To be moved into iPhone application to display section headers
+#             # sections = []
+#             # for cat, desc in text_dict.iteritems():
+#             #    sections.append(cat)
+#             self.json_response = json.dumps(text_dict)
+#         else:
+#             self.json_response = sorry
+#     else:
+#         self.json_response = sorry
+#
+#         os.system("say " + sorry)
+#         most_important = important[0][0]  # This won't be needed once you let users select. Could be default.
+
 def main():
-    coords = [34.057348, -118.273674]
+    coords = [38.078152, 20.790855]
     lat = coords[0]
     lng = coords[1]
-    instance = lm.GetWikiData(lat, lng)
-    print instance.json_response
-    #text_dict = wiki_work(namespace)
-    sections = []
-    for cat, desc in instance.json_response.iteritems():
-       sections.append(cat)
 
-    #text_dict_json = json.dumps(instance.json_response)
+    town = lm.TownStateWikiData(lat, lng)
+    text = town.wiki_townstate(town.namespace)
+    if text:
+        summary = text['Summary']
+        os.system('say %s' % (txt.say_clean(summary)))
 
-    summary = instance.json_response['Summary']
-    history = instance.json_response['Notable people'].replace('(', '.').replace(')', '.')
-    os.system('say %s' % (summary))
-    os.system('say %s' % (history))
-
-
+    geo_precise = lm.GeoPreciseWikiData(lat, lng)
+    closeby_stuff = geo_precise.wiki_geosearch()
+    print closeby_stuff
+    os.system('say %s' % (txt.say_clean(closeby_stuff[0])))
+    text = geo_precise.get_wikidata(closeby_stuff[0])
+    os.system('say %s' % (txt.say_clean(text)))
+    exit()
 
 
 if __name__ == '__main__':
