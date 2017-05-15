@@ -59,5 +59,5 @@ def clean_sorted(tupes):
     return l
 
 
-def say_clean(text):
-    return text.replace('_', ' ').replace('(', '').replace(')', '')
+def shellquote(s):
+    return "'" + s.replace("'", "'\\''") + "'"

@@ -47,8 +47,8 @@ class TownStateWikiData:
                 place_url = namespace[0]+',_'+namespace[1]
             else:
                 place_url = namespace
-                raw = wikipedia.page(place_url).content.encode('utf-8')
-                return txt.text_cleaning(raw)
+            raw = wikipedia.page(place_url).content.encode('utf-8')
+            return txt.text_cleaning(raw)
         except:
             return False
 
@@ -59,19 +59,19 @@ class GeoPreciseWikiData:
         self.lon = lng
 
     def wiki_geosearch(self):
-        """Utilizes wikipedia's geosearch functionality and page views API to return most relevant local info."""
+        """Utilizes Wikipedia's geosearch functionality and page views API to return most relevant local info."""
         closeby = []
-        radius = 100
+        radius = 500
         while len(closeby) < 1 and radius <= 10000:
-            print radius
+            print("Searching within "+ str(radius) + " metres...")
             closeby = wikipedia.geosearch(self.lat, self.lon, radius=radius)
-            radius += 100
-        try:
+            radius += 500
+        if len(closeby) > 0:
             important = wpv.WikiViews(closeby).sorted
             return txt.clean_sorted(important)
-        except IndexError:
-            print(sorry)
+        else:
             os.system("say " + sorry)
+            exit()
 
     @staticmethod
     def get_wikidata(pagename):

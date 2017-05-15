@@ -18,10 +18,13 @@ class WikiViews:
         return [x.replace(' ', '_') for x in pages]
 
     def get_views(self):
-        date_views = self.p.article_views('en.wikipedia', self.pages, granularity='monthly',
-                                start=self.then.strftime('%Y%m%d'), end=self.now.strftime('%Y%m%d'))
-        self.total_views(date_views)
-        return self.sorted_views()
+        try:
+            date_views = self.p.article_views('en.wikipedia', self.pages, granularity='monthly',
+                                    start=self.then.strftime('%Y%m%d'), end=self.now.strftime('%Y%m%d'))
+            self.total_views(date_views)
+            return self.sorted_views()
+        except:
+            exit()
 
     def total_views(self, views):
         for val in views:
